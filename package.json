@@ -1,0 +1,14 @@
+{
+  "name": "shortly",
+  "version": "1.0.0",
+  "description": "A small Node.js app for shortening links/files",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kingston Tam",
+  "license": "CC-BY-NC-4.0",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
