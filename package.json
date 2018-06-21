@@ -1,18 +1,22 @@
 {
   "name": "shortly",
-  "version": "1.0.0",
   "description": "A small Node.js app for shortening links/files",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "version": "0.0.1",
   "author": "Kingston Tam",
   "license": "CC-BY-NC-4.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/kingston/shortly.git"
   },
+  "scripts": {
+    "start": "node ./bin/www"
+  },
   "dependencies": {
-    "express": "^4.16.3"
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.16.0",
+    "http-errors": "~1.6.2",
+    "morgan": "~1.9.0",
+    "pug": "2.0.0-beta11"
   }
 }
