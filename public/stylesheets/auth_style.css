@@ -1,0 +1,29 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+@media (min-width: 768px) {
+    .container-small {
+        width: 300px;
+    }
+}
+@media (min-width: 992px) {
+    .container-small {
+        width: 500px;
+    }
+}
+@media (min-width: 1200px) {
+    .container-small {
+        width: 700px;
+    }
+}
+
+.container-small {
+    max-width: 100%;
+    margin-top: 100px;
+}

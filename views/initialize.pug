@@ -1,0 +1,27 @@
+extends auth_layout
+
+block content
+  h1 Set up Shortly
+  p Shortly hasn't been set up and will need some details from you.
+  if err
+    .alert.alert-danger
+      strong Womp womp... 
+      =err
+  form(method='POST', action='/auth/initialize')
+    .form-group
+      label(for='website_url') Website URL:
+      input#website_url.form-control(type='text',
+        placeholder='e.g. http://myshorturl.com', name='website_url' required)
+    .form-group
+      label(for='username') Username:
+      input#username.form-control(type='text',
+        placeholder='admin username', name='username' required)
+    .form-group
+      label(for='password') Password:
+      input#password.form-control(type='password',
+        placeholder='admin password', name='password' required)
+    .form-group
+      label(for='initialize_password') Initialization Password:
+      input#password.form-control(type='password',
+        placeholder='initialization password', name='initialize_password' required)
+    button.btn.btn-primary(type='Submit') Initialize!
