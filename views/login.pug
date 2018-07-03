@@ -1,0 +1,16 @@
+extends auth_layout
+
+block content
+  h1 Login to Shortly
+  if err
+    .alert.alert-danger
+      strong Womp womp...
+      =err
+  form(method='POST', action='/auth/login')
+    .form-group
+      input#username.form-control(type='text',
+        placeholder='Username', name='username' autofocus required)
+    .form-group
+      input#password.form-control(type='password',
+        placeholder='Password', name='password' required)
+    button.btn.btn-primary(type='Submit') Log in
