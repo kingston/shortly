@@ -1,12 +1,11 @@
-'use strict';
 module.exports = (sequelize, DataTypes) => {
-  var Url = sequelize.define('Url', {
+  const Url = sequelize.define('Url', {
     short_name: DataTypes.STRING,
     full_url: DataTypes.STRING,
     file_location: DataTypes.STRING,
-    file_name: DataTypes.STRING
+    file_name: DataTypes.STRING,
   }, {});
-  Url.associate = function(models) {
+  Url.associate = () => {
     // associations can be defined here
   };
   return Url;

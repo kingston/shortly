@@ -1,8 +1,15 @@
-var express = require('express');
-var router = express.Router();
-var bcrypt = require('bcrypt');
+const express = require('express');
+const router = express.Router();
+const bcrypt = require('bcrypt');
 const models = require('../models');
+const RateLimit = require('express-rate-limit');
 const Setting = models.Setting;
+
+const authLimiter = new RateLimit({
+  windowMs: 10 * 1000, // 10 seconds
+  max: 10,
+  delayMs: 0
+});
 
 let requiresEmptySettings = (req, res, next) => {
   Setting.findAll({attributes: ['id']}).then(settings => {
