@@ -1,4 +1,11 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
 const models = require('../models');
-const Url = models.Url;
+
+const router = express.Router();
+const { Url } = models;
+
+router.get('/', (req, res, next) => {
+  Url.findAll({ attributes: ['short_name', 'full_url'] }).then(
+    //
+  );
+});
