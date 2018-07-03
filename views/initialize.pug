@@ -5,12 +5,12 @@ block content
   p Shortly hasn't been set up and will need some details from you.
   if err
     .alert.alert-danger
-      strong Womp womp... 
+      strong Womp womp...
       =err
   form(method='POST', action='/auth/initialize')
     .form-group
       label(for='website_url') Website URL:
-      input#website_url.form-control(type='text',
+      input#website_url.form-control(type='text', autofocus,
         placeholder='e.g. http://myshorturl.com', name='website_url' required)
     .form-group
       label(for='username') Username:
