@@ -8,7 +8,7 @@ const router = express.Router();
 
 const authLimiter = new RateLimit({
   windowMs: 10 * 1000, // 10 seconds
-  max: 10,
+  max: 5,
   delayMs: 0,
 });
 
