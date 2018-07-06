@@ -7,17 +7,17 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      short_name: {
+      shortName: {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      full_url: {
+      fullUrl: {
         type: Sequelize.STRING,
       },
-      file_location: {
+      fileLocation: {
         type: Sequelize.STRING,
       },
-      file_name: {
+      fileName: {
         type: Sequelize.STRING,
       },
       createdAt: {

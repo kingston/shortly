@@ -69,7 +69,7 @@ router.post('/urls/new', fileUpload(uploadOptions), async (req, res, next) => {
       return;
     }
 
-    const urlParams = { short_name: shortName };
+    const urlParams = { shortName };
 
     if (req.files && req.files.attachment) {
       const { attachment } = req.files;
@@ -81,11 +81,11 @@ router.post('/urls/new', fileUpload(uploadOptions), async (req, res, next) => {
       }
       uploadedPath = `${uploadDirectory}/${newFilename}`;
       await attachment.mv(uploadedPath);
-      urlParams.file_location = newFilename;
-      urlParams.file_name = attachment.name;
+      urlParams.fileLocation = newFilename;
+      urlParams.fileName = attachment.name;
     } else {
-      urlParams.full_url = formatUrl(fullUrl);
-      if (!urlParams.full_url) {
+      urlParams.fullUrl = formatUrl(fullUrl);
+      if (!urlParams.fullUrl) {
         res.redirect('/urls?err=Invalid%20url');
         return;
       }
@@ -114,7 +114,9 @@ router.post('/urls/delete/:id', async (req, res, next) => {
     });
     if (!url) throw new Error('Unable to find URL by ID');
     await url.destroy();
-    await util.promisify(fs.unlink)(`${uploadDirectory}/${url.file_name}`);
+    if (url.fileName) {
+      await util.promisify(fs.unlink)(`${uploadDirectory}/${url.fileLocation}`);
+    }
     res.redirect('/urls?success=Deleted!');
   } catch (err) {
     console.log(err);
@@ -133,13 +135,13 @@ router.get('/:key?', (req, res, next) => {
   Url.findByShortName(key).then((url) => {
     if (url === null) {
       next(); // pass to 404
-    } else if (url.file_location) {
+    } else if (url.fileLocation) {
       res.download(
-        `${uploadDirectory}/${url.file_location}`,
-        url.file_name,
+        `${uploadDirectory}/${url.fileLocation}`,
+        url.fileName,
       );
     } else {
-      res.redirect(url.full_url);
+      res.redirect(url.fullUrl);
     }
   }).catch((err) => {
     next(err);

@@ -36,11 +36,11 @@ block content
       tbody
         each url in urls
           tr
-            td=url.short_name
-            if url.file_name
-              td= '[' + url.file_name + ']'
+            td=url.shortName
+            if url.fileName
+              td= '[' + url.fileName + ']'
             else
-              td= url.full_url
+              td= url.fullUrl
             td
               form(method='POST', action='/urls/delete/' + url.id)
                 button.btn.btn-primary Delete
