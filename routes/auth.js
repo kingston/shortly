@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const RateLimit = require('express-rate-limit');
 const models = require('../models');
 const authSession = require('../middleware/auth_session');
+const config = require('../config/config');
 
 const { Setting } = models;
 const router = express.Router();
@@ -38,7 +39,7 @@ router.post('/initialize', requiresEmptySettings, authLimiter, (req, res, next) 
   const {
     username, password, websiteUrl, initializePassword,
   } = req.body;
-  if (initializePassword !== 'password') {
+  if (initializePassword !== config.adminPassword) {
     renderInitialize(res, 'Invalid admin password');
   }
 

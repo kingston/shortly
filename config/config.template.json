@@ -5,6 +5,7 @@
     "database": "shortly-db",
     "host": "127.0.0.1",
     "dialect": "postgres",
-    "secret": "blahdeblah"
+    "secret": "blahdeblah",
+    "adminPassword": "password"
   }
 }
