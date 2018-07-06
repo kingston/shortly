@@ -93,7 +93,6 @@ router.post('/login', authLimiter, (req, res, next) => {
       renderLogin(res, 'Your username or password was incorrect.');
     }
   }).catch((err) => {
-    console.log(err);
     renderLogin(res, 'Unable to login');
   });
 });
