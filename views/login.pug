@@ -2,18 +2,7 @@ extends auth_layout
 
 block content
   h1 Login to Shortly
-  if err
-    .alert.alert-danger
-      strong Womp womp...
-      |
-      |
-      =err
-  if success
-    .alert.alert-success
-      strong Yay!
-      |
-      |
-      =success
+  +alert(alertMessage, alertType)
   form(method='POST', action='/auth/login')
     .form-group
       input#username.form-control(type='text',

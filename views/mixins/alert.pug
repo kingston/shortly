@@ -1,0 +1,10 @@
+mixin alert(message, type)
+  if alertMessage
+    if type === 'error'
+      .div.alert.alert-danger
+        strong Oops!&nbsp;
+        =message
+    else if type === 'success'
+      .div.alert.alert-success
+        strong Yay!&nbsp;
+        =message

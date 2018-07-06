@@ -67,7 +67,11 @@ router.post('/initialize', requiresEmptySettings, authLimiter, (req, res, next) 
 });
 
 const renderLogin = (res, err = null) => {
-  res.render('login', { title: 'Log into Shortly', err });
+  res.render('login', {
+    title: 'Log into Shortly',
+    alertMessage: err,
+    alertType: 'error',
+  });
 };
 
 /* GET login page */
