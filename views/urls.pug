@@ -1,0 +1,35 @@
+extends layout
+
+block content
+  h1 Shortly URLs
+  if err
+    .alert.alert-danger
+      strong Womp womp...
+      |
+      =err
+  .add-url
+    h2 Add new URL
+    form.form-inline(method='POST', action='/urls/new')
+      input#short-name.form-control.mb-2.mr-2(type='text',
+        placeholder='Short Name', name='short_name' autofocus required)
+      input#full-url.form-control.mb-2.mr-2(type='text',
+        placeholder='Full URL', name='full_url')
+      strong.mb-2.mr-2 or...
+      .custom-file
+        input#attachment.custom-file-input(type='file', name='attachment')
+        label.custom-file-label(for='attachment')
+      button.btn.btn-primary.mr-2(type='Submit') Post URL
+  .url-list
+    h2 All the URLs
+    table
+      thead
+        tr
+          th Short Link
+          th Destination
+          th
+      tbody
+        each url in urls
+          tr
+            td=url.short_name
+            td=url.full_url
+            td Delete

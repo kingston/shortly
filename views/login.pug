@@ -5,7 +5,15 @@ block content
   if err
     .alert.alert-danger
       strong Womp womp...
+      |
+      |
       =err
+  if success
+    .alert.alert-success
+      strong Yay!
+      |
+      |
+      =success
   form(method='POST', action='/auth/login')
     .form-group
       input#username.form-control(type='text',
@@ -13,4 +21,4 @@ block content
     .form-group
       input#password.form-control(type='password',
         placeholder='Password', name='password' required)
-    button.btn.btn-primary(type='Submit') Log in
+    button.btn.btn-primary(type='Submit') Add new URL

@@ -5,7 +5,8 @@ block content
   p Shortly hasn't been set up and will need some details from you.
   if err
     .alert.alert-danger
-      strong Womp womp...
+      strong Womp womp..
+      |
       =err
   form(method='POST', action='/auth/initialize')
     .form-group
