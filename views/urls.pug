@@ -7,6 +7,12 @@ block content
       strong Womp womp...
       |
       =err
+  if success
+    .alert.alert-success
+      strong Yay!
+      |
+      |
+      =success
   .add-url
     h2 Add new URL
     form.form-inline(method='POST', action='/urls/new')
