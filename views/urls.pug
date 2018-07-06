@@ -11,7 +11,7 @@ block content
     h2 Add new URL
     form.form-inline(method='POST', action='/urls/new')
       input#short-name.form-control.mb-2.mr-2(type='text',
-        placeholder='Short Name', name='short_name' autofocus required)
+        placeholder='Short Name', name='short_name' autofocus)
       input#full-url.form-control.mb-2.mr-2(type='text',
         placeholder='Full URL', name='full_url')
       strong.mb-2.mr-2 or...
@@ -32,4 +32,6 @@ block content
           tr
             td=url.short_name
             td=url.full_url
-            td Delete
+            td
+              form(method='POST', action='/urls/delete/' + url.id)
+                button.btn.btn-primary Delete

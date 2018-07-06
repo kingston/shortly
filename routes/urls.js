@@ -5,20 +5,12 @@ const authSession = require('../middleware/auth_session');
 const router = express.Router();
 const { Url } = models;
 
-// Useful attributes
-const urlAttributes = [
-  'short_name',
-  'full_url',
-  'file_location',
-  'file_name',
-];
-
 // Require login for any URL-related route
-router.use(authSession.requiresLogin);
+router.use('/urls', authSession.requiresLogin);
 
 // List URLs
 router.get('/urls', (req, res, next) => {
-  Url.findAll({ attributes: urlAttributes }).then((urls) => {
+  Url.findAll().then((urls) => {
     console.log(urls);
     const { err, success } = req.query;
     res.render('urls', { urls, err, success });
@@ -32,13 +24,15 @@ const invalidShorts = [
   'urls',
 ];
 
-const shortNameRegex = /[a-z0-9]+/i;
+const shortNameRegex = /[a-z0-9]*/i;
 
-function isValidShortName(name) {
-  return typeof name === 'string'
-         && !invalidShorts.includes(name)
-         && shortNameRegex.test(name)
-         && name.length < 30;
+function checkIsValidShortName(name) {
+  if (typeof name !== 'string'
+     || invalidShorts.includes(name)
+     || !shortNameRegex.test(name)
+     || name.length > 30) return new Promise(false);
+
+  return Url.findByShortName(name).then(url => url === null);
 }
 
 function formatUrl(url) {
@@ -56,20 +50,38 @@ router.post('/urls/new', (req, res, next) => {
     short_name: shortName,
     full_url: fullUrl,
   } = req.body;
-  if (!isValidShortName(shortName)) {
-    res.redirect('/urls?err=Invalid%20short%20name');
-    return;
-  }
-  const parsedUrl = formatUrl(fullUrl);
-  if (!parsedUrl) {
-    res.redirect('/urls?err=Invalid%20url');
-    return;
-  }
-  Url.create({
-    short_name: shortName,
-    full_url: parsedUrl,
+  checkIsValidShortName(shortName).then((result) => {
+    if (!result) {
+      res.redirect('/urls?err=Invalid%20short%20name');
+      return;
+    }
+    const parsedUrl = formatUrl(fullUrl);
+    if (!parsedUrl) {
+      res.redirect('/urls?err=Invalid%20url');
+      return;
+    }
+    Url.create({
+      short_name: shortName,
+      full_url: parsedUrl,
+    }).then((url) => {
+      res.redirect('/urls?success=Successfully%20created!');
+    }).catch((err) => {
+      res.redirect('/urls?err=Error!');
+    });
+  }).catch((err) => {
+    res.redirect('/urls?err=Error!');
+  });
+});
+
+router.post('/urls/delete/:id', (req, res, next) => {
+  Url.destroy({
+    where: {
+      id: req.params.id,
+    },
   }).then((url) => {
-    res.redirect('/urls?success=Successfully%20created!');
+    res.redirect('/urls?success=Deleted!');
+  }).catch((err) => {
+    res.redirect('/urls?err=Unable%20to%20delete!');
   });
 });
 
@@ -81,12 +93,7 @@ router.get('/:key?', (req, res, next) => {
   // strip any string longer than 30 characters
   if (key.length > 30) key = key.substring(0, 30);
 
-  Url.findOne({
-    attributes: urlAttributes,
-    where: {
-      short_name: key,
-    },
-  }).then((url) => {
+  Url.findByShortName(key).then((url) => {
     if (url === null) {
       next(); // pass to 404
     } else {
