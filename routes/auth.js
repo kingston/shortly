@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const RateLimit = require('express-rate-limit');
 const models = require('../models');
+const authSession = require('../middleware/auth_session');
 
 const { Setting } = models;
 const router = express.Router();
@@ -86,11 +87,13 @@ router.post('/login', authLimiter, (req, res, next) => {
     return checkLogin(req, settings);
   }).then((isValid) => {
     if (isValid) {
+      authSession.login(req);
       res.redirect('/urls');
     } else {
       renderLogin(res, 'Your username or password was incorrect.');
     }
   }).catch((err) => {
+    console.log(err);
     renderLogin(res, 'Unable to login');
   });
 });

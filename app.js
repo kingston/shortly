@@ -2,10 +2,15 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const logger = require('morgan');
+
+const env = process.env.NODE_ENV || 'development';
+const config = require('./config/config.json')[env];
 
 const authRouter = require('./routes/auth');
 const urlsRouter = require('./routes/urls');
+
 
 const app = express();
 
@@ -18,6 +23,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+const sessionSettings = {
+  cookie: {
+    httpOnly: true,
+    maxAge: 30 * 60 * 1000,
+    sameSite: true,
+  },
+  secret: config.secret,
+  saveUninitialized: false,
+  resave: false,
+};
+
+if (app.get('env') === 'production') {
+  app.set('trust proxy', 1);
+  sessionSettings.cookie.secure = true;
+}
+
+app.use(session(sessionSettings));
 
 app.use('/auth', authRouter);
 app.use('/', urlsRouter);

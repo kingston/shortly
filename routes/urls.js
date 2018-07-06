@@ -1,5 +1,6 @@
 const express = require('express');
 const models = require('../models');
+const authSession = require('../middleware/auth_session');
 
 const router = express.Router();
 const { Url } = models;
@@ -11,6 +12,9 @@ const urlAttributes = [
   'file_location',
   'file_name',
 ];
+
+// Require login for any URL-related route
+router.use(authSession.requiresLogin);
 
 // List URLs
 router.get('/urls', (req, res, next) => {
