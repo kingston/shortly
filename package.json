@@ -16,6 +16,7 @@
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
+    "express-fileupload": "^0.4.0",
     "express-rate-limit": "^2.11.0",
     "express-session": "^1.15.6",
     "http-errors": "~1.6.2",
@@ -23,7 +24,8 @@
     "pg": "^7.4.3",
     "pg-hstore": "^2.3.2",
     "pug": "2.0.0-beta11",
-    "sequelize": "^4.38.0"
+    "sequelize": "^4.38.0",
+    "shortid": "^2.2.8"
   },
   "devDependencies": {
     "eslint": "^4.19.1",

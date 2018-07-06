@@ -15,7 +15,7 @@ block content
       =success
   .add-url
     h2 Add new URL
-    form.form-inline(method='POST', action='/urls/new')
+    form.form-inline(method='POST', action='/urls/new', encType='multipart/form-data')
       input#short-name.form-control.mb-2.mr-2(type='text',
         placeholder='Short Name', name='short_name' autofocus)
       input#full-url.form-control.mb-2.mr-2(type='text',
@@ -37,7 +37,10 @@ block content
         each url in urls
           tr
             td=url.short_name
-            td=url.full_url
+            if url.file_name
+              td= '[' + url.file_name + ']'
+            else
+              td= url.full_url
             td
               form(method='POST', action='/urls/delete/' + url.id)
                 button.btn.btn-primary Delete

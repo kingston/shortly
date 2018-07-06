@@ -8,6 +8,9 @@ yarn-error.log*
 # Config
 config/config.json
 
+# Uploads
+uploads
+
 # Runtime data
 pids
 *.pid
