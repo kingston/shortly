@@ -3,6 +3,7 @@ const fileUpload = require('express-fileupload');
 const shortid = require('shortid');
 const fs = require('fs');
 const util = require('util');
+const csrf = require('csurf');
 const models = require('../models');
 const authSession = require('../middleware/auth_session');
 const alert = require('../middleware/alert');
@@ -11,8 +12,18 @@ const logger = require('../utilities/logger.js');
 const router = express.Router();
 const { Url } = models;
 
+const csrfProtection = csrf();
+const uploadOptions = {
+  safeFileNames: false,
+  abortOnLimit: true,
+  limits: { fileSize: 200 * 1024 * 1024 },
+};
+
+router.use('/urls/new', fileUpload(uploadOptions));
+
 // Require login and alert for any URL-related route
 router.use('/urls', authSession.requiresLogin);
+router.use('/urls', csrfProtection);
 router.use('/urls', alert);
 
 // List URLs
@@ -21,7 +32,13 @@ router.get('/urls', async (req, res, next) => {
     const urls = await Url.findAll();
     const alertType = req.alert.getType();
     const alertMessage = req.alert.getMessage();
-    res.render('urls', { urls, alertType, alertMessage });
+    const csrfToken = req.csrfToken();
+    res.render('urls', {
+      urls,
+      alertType,
+      alertMessage,
+      csrfToken,
+    });
     req.alert.clear();
   } catch (err) {
     logger.error('Unable to list URLs', err);
@@ -61,14 +78,9 @@ function formatUrl(url) {
 }
 
 const uploadDirectory = `${__dirname}/../uploads`;
-const uploadOptions = {
-  safeFileNames: false,
-  abortOnLimit: true,
-  limits: { fileSize: 200 * 1024 * 1024 },
-};
 
 // Add new URL
-router.post('/urls/new', fileUpload(uploadOptions), async (req, res, next) => {
+router.post('/urls/new', async (req, res, next) => {
   let uploadedPath;
   try {
     const {

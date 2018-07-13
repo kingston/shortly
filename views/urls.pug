@@ -6,6 +6,7 @@ block content
   .add-url
     h2 Add new URL
     form.form-inline(method='POST', action='/urls/new', encType='multipart/form-data')
+      input(type='hidden', name='_csrf', value=csrfToken)
       input#short-name.form-control.mb-2.mr-2(type='text',
         placeholder='Short Name', name='short_name' autofocus)
       input#full-url.form-control.mb-2.mr-2(type='text',
@@ -33,4 +34,5 @@ block content
               td= url.fullUrl
             td
               form(method='POST', action='/urls/delete/' + url.id)
+                input(type='hidden', name='_csrf', value=csrfToken)
                 button.btn.btn-primary Delete
