@@ -4,6 +4,7 @@ const RateLimit = require('express-rate-limit');
 const models = require('../models');
 const authSession = require('../middleware/auth_session');
 const config = require('../config/config');
+const logger = require('../utilities/logger.js');
 
 const { Setting } = models;
 const router = express.Router();
@@ -26,6 +27,7 @@ async function requiresEmptySettings(req, res, next) {
     }
     next();
   } catch (err) {
+    logger.error('Unable to check for empty settings', err);
     next(err);
   }
 }
@@ -76,6 +78,7 @@ router.post('/initialize', requiresEmptySettings, authLimiter, async (req, res, 
     });
     res.redirect('/auth/login');
   } catch (err) {
+    logger.error('Error initializing', err);
     renderInitialize(res, 'Error setting up database!');
   }
 });
@@ -113,6 +116,7 @@ router.post('/login', authLimiter, async (req, res, next) => {
       renderLogin(res, 'Your username or password was incorrect.');
     }
   } catch (err) {
+    logger.error('Unable to login', err);
     renderLogin(res, 'Unable to login');
   }
 });
