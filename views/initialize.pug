@@ -3,11 +3,7 @@ extends auth_layout
 block content
   h1 Set up Shortly
   p Shortly hasn't been set up and will need some details from you.
-  if err
-    .alert.alert-danger
-      strong Womp womp..
-      |
-      =err
+  +alert(alertMessage, alertType)
   form(method='POST', action='/auth/initialize')
     .form-group
       label(for='website_url') Website URL:

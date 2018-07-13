@@ -5,25 +5,34 @@ const fs = require('fs');
 const util = require('util');
 const models = require('../models');
 const authSession = require('../middleware/auth_session');
+const alert = require('../middleware/alert');
 const logger = require('../utilities/logger.js');
 
 const router = express.Router();
 const { Url } = models;
 
-// Require login for any URL-related route
+// Require login and alert for any URL-related route
 router.use('/urls', authSession.requiresLogin);
+router.use('/urls', alert);
 
 // List URLs
 router.get('/urls', async (req, res, next) => {
   try {
     const urls = await Url.findAll();
-    const { err, success } = req.query;
-    res.render('urls', { urls, err, success });
+    const alertType = req.alert.getType();
+    const alertMessage = req.alert.getMessage();
+    res.render('urls', { urls, alertType, alertMessage });
+    req.alert.clear();
   } catch (err) {
     logger.error('Unable to list URLs', err);
     next(err);
   }
 });
+
+function redirectToList(res, type, message) {
+  res.alert.add(type, message);
+  res.redirect('/urls');
+}
 
 const invalidShorts = [
   'auth',
@@ -67,7 +76,7 @@ router.post('/urls/new', fileUpload(uploadOptions), async (req, res, next) => {
       full_url: fullUrl,
     } = req.body;
     if (!await checkIsValidShortName(shortName)) {
-      res.redirect('/urls?err=Invalid%20short%20name');
+      redirectToList(res, 'error', 'Invalid short name');
       return;
     }
 
@@ -88,12 +97,12 @@ router.post('/urls/new', fileUpload(uploadOptions), async (req, res, next) => {
     } else {
       urlParams.fullUrl = formatUrl(fullUrl);
       if (!urlParams.fullUrl) {
-        res.redirect('/urls?err=Invalid%20url');
+        redirectToList(res, 'error', 'Invalid URL');
         return;
       }
     }
     await Url.create(urlParams);
-    res.redirect('/urls?success=Successfully%20created!');
+    redirectToList(res, 'success', 'Successfully created URL!');
   } catch (err) {
     logger.err('Unable to add URL', err);
     if (uploadedPath) {
@@ -103,7 +112,7 @@ router.post('/urls/new', fileUpload(uploadOptions), async (req, res, next) => {
         // ignore
       }
     }
-    res.redirect(`/urls?err=${err.toString()}`);
+    redirectToList(res, 'error', 'Unable to add URL!');
   }
 });
 
@@ -119,10 +128,10 @@ router.post('/urls/delete/:id', async (req, res, next) => {
     if (url.fileName) {
       await util.promisify(fs.unlink)(`${uploadDirectory}/${url.fileLocation}`);
     }
-    res.redirect('/urls?success=Deleted!');
+    redirectToList(res, 'success', 'Deleted URL!');
   } catch (err) {
     logger.error('Unable to delete URL', err);
-    res.redirect('/urls?err=Unable%20to%20delete!');
+    redirectToList(res, 'error', 'Unable to delete URL!');
   }
 });
 
