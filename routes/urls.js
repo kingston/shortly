@@ -5,7 +5,7 @@ const fs = require('fs');
 const util = require('util');
 const models = require('../models');
 const authSession = require('../middleware/auth_session');
-
+const logger = require('../utilities/logger.js');
 
 const router = express.Router();
 const { Url } = models;
@@ -14,13 +14,15 @@ const { Url } = models;
 router.use('/urls', authSession.requiresLogin);
 
 // List URLs
-router.get('/urls', (req, res, next) => {
-  Url.findAll().then((urls) => {
+router.get('/urls', async (req, res, next) => {
+  try {
+    const urls = await Url.findAll();
     const { err, success } = req.query;
     res.render('urls', { urls, err, success });
-  }).catch((err) => {
+  } catch (err) {
+    logger.error('Unable to list URLs', err);
     next(err);
-  });
+  }
 });
 
 const invalidShorts = [
@@ -31,13 +33,13 @@ const invalidShorts = [
 
 const shortNameRegex = /[a-z0-9]*/i;
 
-function checkIsValidShortName(name) {
+async function checkIsValidShortName(name) {
   if (typeof name !== 'string'
      || invalidShorts.includes(name)
      || !shortNameRegex.test(name)
-     || name.length > 30) return new Promise(false);
+     || name.length > 30) return false;
 
-  return Url.findByShortName(name).then(url => url === null);
+  return (await Url.findByShortName(name)) === null;
 }
 
 function formatUrl(url) {
@@ -93,7 +95,7 @@ router.post('/urls/new', fileUpload(uploadOptions), async (req, res, next) => {
     await Url.create(urlParams);
     res.redirect('/urls?success=Successfully%20created!');
   } catch (err) {
-    console.log(err);
+    logger.err('Unable to add URL', err);
     if (uploadedPath) {
       try {
         await util.promisify(fs.unlink)(uploadedPath);
@@ -119,7 +121,7 @@ router.post('/urls/delete/:id', async (req, res, next) => {
     }
     res.redirect('/urls?success=Deleted!');
   } catch (err) {
-    console.log(err);
+    logger.error('Unable to delete URL', err);
     res.redirect('/urls?err=Unable%20to%20delete!');
   }
 });
@@ -144,6 +146,7 @@ router.get('/:key?', (req, res, next) => {
       res.redirect(url.fullUrl);
     }
   }).catch((err) => {
+    logger.error('Unable to find URL by short name', err);
     next(err);
   });
 });
