@@ -14,19 +14,29 @@ const authLimiter = new RateLimit({
   delayMs: 0,
 });
 
-const requiresEmptySettings = (req, res, next) => {
-  Setting.findAll({ attributes: ['id'] }).then((settings) => {
+// SECTION: Initialization code
+
+// Ensure settings haven't been set up
+async function requiresEmptySettings(req, res, next) {
+  try {
+    const settings = await Setting.findAll({ attributes: ['id'] });
     if (settings.length > 0) {
       const err = new Error('App has already been initialized');
       next(err);
     }
     next();
-  });
-};
+  } catch (err) {
+    next(err);
+  }
+}
 
-const renderInitialize = (res, err = null) => {
-  res.render('initialize', { title: 'Initialize Shortly', err });
-};
+function renderInitialize(res, err = null) {
+  res.render('initialize', {
+    title: 'Initialize Shortly',
+    alertMessage: err,
+    alertType: 'error',
+  });
+}
 
 /* GET initialization page */
 router.get('/initialize', requiresEmptySettings, (req, res, next) => {
@@ -34,37 +44,43 @@ router.get('/initialize', requiresEmptySettings, (req, res, next) => {
 });
 
 /* POST initialization page */
-router.post('/initialize', requiresEmptySettings, authLimiter, (req, res, next) => {
-  // Always check init password first
-  const {
-    username, password, websiteUrl, initializePassword,
-  } = req.body;
-  if (initializePassword !== config.adminPassword) {
-    renderInitialize(res, 'Invalid admin password');
-  }
+router.post('/initialize', requiresEmptySettings, authLimiter, async (req, res, next) => {
+  try {
+    const {
+      username, password, websiteUrl, initializePassword,
+    } = req.body;
 
-  // Initialize settings
-  bcrypt.hash(password, 10).then(hash => (
-    models.sequelize.transaction(t => (
-      Setting.create({
-        key: 'username',
-        value: username,
-      }, { transaction: t }).then(s => (
+    // Always check init password first
+    if (initializePassword !== config.adminPassword) {
+      renderInitialize(res, 'Invalid admin password');
+    }
+
+    // Initialize settings
+    const hash = await bcrypt.hash(password, 10);
+
+    models.sequelize.transaction(async (t) => {
+      await Promise.all([
+        Setting.create({
+          key: 'username',
+          value: username,
+        }, { transaction: t }),
         Setting.create({
           key: 'password',
           value: hash,
-        }, { transaction: t }))).then(s => (
+        }, { transaction: t }),
         Setting.create({
           key: 'website_url',
           value: websiteUrl,
-        }, { transaction: t })))
-    ))
-  )).then(result => (
-    res.redirect('/auth/login')
-  )).catch((err) => {
+        }, { transaction: t }),
+      ]);
+    });
+    res.redirect('/auth/login');
+  } catch (err) {
     renderInitialize(res, 'Error setting up database!');
-  });
+  }
 });
+
+// SECTION: Login things...
 
 const renderLogin = (res, err = null) => {
   res.render('login', {
@@ -81,25 +97,24 @@ router.get('/login', (req, res, next) => {
 
 /* POST login page */
 
-const checkLogin = (req, settings) => {
+async function checkLogin(req, settings) {
   if (settings.get('username') !== req.body.username) return false;
   return bcrypt.compare(req.body.password, settings.get('password'));
-};
+}
 
-router.post('/login', authLimiter, (req, res, next) => {
-  Setting.findAll({ attributes: ['key', 'value'] }).then((rawSettings) => {
+router.post('/login', authLimiter, async (req, res, next) => {
+  try {
+    const rawSettings = await Setting.findAll({ attributes: ['key', 'value'] });
     const settings = new Map(rawSettings.map(i => [i.key, i.value]));
-    return checkLogin(req, settings);
-  }).then((isValid) => {
-    if (isValid) {
+    if (await checkLogin(req, settings)) {
       authSession.login(req);
       res.redirect('/urls');
     } else {
       renderLogin(res, 'Your username or password was incorrect.');
     }
-  }).catch((err) => {
+  } catch (err) {
     renderLogin(res, 'Unable to login');
-  });
+  }
 });
 
 module.exports = router;
