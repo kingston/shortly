@@ -4,7 +4,7 @@ const RateLimit = require('express-rate-limit');
 const models = require('../models');
 const authSession = require('../middleware/auth_session');
 const config = require('../config/config');
-const logger = require('../utilities/logger.js');
+const logger = require('../config/winston');
 
 const { Setting } = models;
 const router = express.Router();

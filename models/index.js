@@ -9,10 +9,15 @@ const env = process.env.NODE_ENV || 'development';
 const db = {};
 const config = require('../config/config.json')[env];
 
+const logger = require('../config/winston');
+
 let sequelize;
 
 // disable operator aliases
 config.operatorsAliases = false;
+
+// assign winston as logger
+config.logging = logger.debug;
 
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);

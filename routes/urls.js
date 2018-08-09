@@ -8,7 +8,7 @@ const { URL } = require('url');
 const models = require('../models');
 const authSession = require('../middleware/auth_session');
 const alert = require('../middleware/alert');
-const logger = require('../utilities/logger.js');
+const logger = require('../config/winston');
 
 const router = express.Router();
 const { Url } = models;
