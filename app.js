@@ -11,7 +11,7 @@ const config = require('./config/config.json')[env];
 
 const authRouter = require('./routes/auth');
 const urlsRouter = require('./routes/urls');
-
+const models = require('./models');
 
 const app = express();
 
@@ -32,6 +32,7 @@ const sessionSettings = {
     maxAge: 30 * 60 * 1000,
     sameSite: true,
   },
+  store: models.sessionStore,
   secret: config.secret,
   saveUninitialized: false,
   resave: false,
@@ -40,6 +41,7 @@ const sessionSettings = {
 if (app.get('env') === 'production') {
   app.set('trust proxy', 1);
   sessionSettings.cookie.secure = true;
+  sessionSettings.proxy = true;
 }
 
 app.use(session(sessionSettings));

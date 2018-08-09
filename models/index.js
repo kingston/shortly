@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
+const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
@@ -30,6 +32,11 @@ Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
+});
+
+// add session store
+db.sessionStore = new SequelizeStore({
+  db: sequelize,
 });
 
 db.sequelize = sequelize;
