@@ -19,7 +19,14 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-app.use(logger('dev'));
+const isProduction = (app.get('env') === 'production');
+
+if (isProduction) {
+  app.use(logger('combined'));
+} else {
+  app.use(logger('dev'));
+}
+
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -38,7 +45,7 @@ const sessionSettings = {
   resave: false,
 };
 
-if (app.get('env') === 'production') {
+if (isProduction) {
   app.set('trust proxy', 'loopback');
   sessionSettings.cookie.secure = true;
   sessionSettings.proxy = true;
