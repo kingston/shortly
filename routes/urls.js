@@ -4,6 +4,7 @@ const shortid = require('shortid');
 const fs = require('fs');
 const util = require('util');
 const csrf = require('csurf');
+const { URL } = require('url');
 const models = require('../models');
 const authSession = require('../middleware/auth_session');
 const alert = require('../middleware/alert');
@@ -68,10 +69,16 @@ async function checkIsValidShortName(name) {
   return (await Url.findByShortName(name)) === null;
 }
 
+const urlPrefix = /^[a-z^:]:/i;
+
 function formatUrl(url) {
   try {
+    let newUrl = url;
+    if (!url.match(urlPrefix)) {
+      newUrl = `https://${url}`;
+    }
     // reparse URL
-    return new URL(url).href;
+    return new URL(newUrl).href;
   } catch (e) {
     return null;
   }
