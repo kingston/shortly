@@ -98,6 +98,13 @@ router.get('/login', (req, res, next) => {
   renderLogin(res);
 });
 
+/* POST logout page */
+
+router.post('/logout', (req, res, next) => {
+  authSession.logout(req);
+  res.redirect('/auth/login');
+});
+
 /* POST login page */
 
 async function checkLogin(req, settings) {

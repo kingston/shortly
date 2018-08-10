@@ -3,6 +3,9 @@ extends layout
 block content
   h1 Shortly URLs
   +alert(alertMessage, alertType)
+  .log-out
+    form(method='POST', action='/auth/logout')
+      button.btn.btn-primary(type='Submit') Log Out
   .add-url
     h2 Add new URL
     form.form-inline(method='POST', action='/urls/new', encType='multipart/form-data')
