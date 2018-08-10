@@ -70,7 +70,7 @@ async function checkIsValidShortName(name) {
   return (await Url.findByShortName(name)) === null;
 }
 
-const urlPrefix = /^[a-z^:]:/i;
+const urlPrefix = /^[a-z^:]+:/i;
 
 function formatUrl(url) {
   try {
