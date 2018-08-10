@@ -34,13 +34,13 @@ router.get('/urls', async (req, res, next) => {
     const alertType = req.alert.getType();
     const alertMessage = req.alert.getMessage();
     const csrfToken = req.csrfToken();
+    res.alert.clear();
     res.render('urls', {
       urls,
       alertType,
       alertMessage,
       csrfToken,
     });
-    req.alert.clear();
   } catch (err) {
     logger.error('Unable to list URLs', err);
     next(err);
@@ -48,8 +48,9 @@ router.get('/urls', async (req, res, next) => {
 });
 
 function redirectToList(res, type, message) {
-  res.alert.add(type, message);
-  res.redirect('/urls');
+  res.alert.add(type, message, () => {
+    res.redirect('/urls');
+  });
 }
 
 const invalidShorts = [

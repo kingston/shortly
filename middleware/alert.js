@@ -8,15 +8,16 @@ module.exports = (req, res, next) => {
     getType() {
       return req.session.alertType;
     },
+  };
+  res.alert = {
+    add(type, message, callback) {
+      req.session.alertType = type;
+      req.session.alertMessage = message;
+      req.session.save(callback);
+    },
     clear() {
       delete req.session.alertMessage;
       delete req.session.alertType;
-    },
-  };
-  res.alert = {
-    add(type, message) {
-      req.session.alertType = type;
-      req.session.alertMessage = message;
     },
   };
   next();
