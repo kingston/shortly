@@ -34,7 +34,7 @@ router.get('/urls', async (req, res, next) => {
     const alertType = req.alert.getType();
     const alertMessage = req.alert.getMessage();
     const csrfToken = req.csrfToken();
-    res.alert.clear();
+    await res.alert.clear();
     res.render('urls', {
       urls,
       alertType,
@@ -47,10 +47,9 @@ router.get('/urls', async (req, res, next) => {
   }
 });
 
-function redirectToList(res, type, message) {
-  res.alert.add(type, message, () => {
-    res.redirect('/urls');
-  });
+async function redirectToList(res, type, message) {
+  await res.alert.add(type, message);
+  res.redirect('/urls');
 }
 
 const invalidShorts = [
@@ -96,7 +95,7 @@ router.post('/urls/new', async (req, res, next) => {
       full_url: fullUrl,
     } = req.body;
     if (!await checkIsValidShortName(shortName)) {
-      redirectToList(res, 'error', 'Invalid short name');
+      await redirectToList(res, 'error', 'Invalid short name');
       return;
     }
 
@@ -117,12 +116,12 @@ router.post('/urls/new', async (req, res, next) => {
     } else {
       urlParams.fullUrl = formatUrl(fullUrl);
       if (!urlParams.fullUrl) {
-        redirectToList(res, 'error', 'Invalid URL');
+        await redirectToList(res, 'error', 'Invalid URL');
         return;
       }
     }
     await Url.create(urlParams);
-    redirectToList(res, 'success', 'Successfully created URL!');
+    await redirectToList(res, 'success', 'Successfully created URL!');
   } catch (err) {
     logger.err('Unable to add URL', err);
     if (uploadedPath) {
@@ -132,7 +131,7 @@ router.post('/urls/new', async (req, res, next) => {
         // ignore
       }
     }
-    redirectToList(res, 'error', 'Unable to add URL!');
+    await redirectToList(res, 'error', 'Unable to add URL!');
   }
 });
 
@@ -148,10 +147,10 @@ router.post('/urls/delete/:id', async (req, res, next) => {
     if (url.fileName) {
       await util.promisify(fs.unlink)(`${uploadDirectory}/${url.fileLocation}`);
     }
-    redirectToList(res, 'success', 'Deleted URL!');
+    await redirectToList(res, 'success', 'Deleted URL!');
   } catch (err) {
     logger.error('Unable to delete URL', err);
-    redirectToList(res, 'error', 'Unable to delete URL!');
+    await redirectToList(res, 'error', 'Unable to delete URL!');
   }
 });
 

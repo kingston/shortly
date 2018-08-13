@@ -1,3 +1,5 @@
+const util = require('util');
+
 const authSession = {};
 
 authSession.requiresLogin = (req, res, next) => {
@@ -8,12 +10,13 @@ authSession.requiresLogin = (req, res, next) => {
   }
 };
 
-authSession.login = (req) => {
+authSession.login = async (req) => {
   req.session.loggedIn = true;
+  await util.promisify(callback => req.session.save(callback))();
 };
 
-authSession.logout = (req) => {
-  req.session.destroy();
+authSession.logout = async (req) => {
+  await util.promisify(callback => req.session.destroy(callback))();
 };
 
 module.exports = authSession;

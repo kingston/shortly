@@ -1,4 +1,5 @@
 // Allows routes to add alerts to be shown on the next screen
+const util = require('util');
 
 module.exports = (req, res, next) => {
   req.alert = {
@@ -10,12 +11,12 @@ module.exports = (req, res, next) => {
     },
   };
   res.alert = {
-    add(type, message, callback) {
+    async add(type, message) {
       req.session.alertType = type;
       req.session.alertMessage = message;
-      req.session.save(callback);
+      await util.promisify(callback => req.session.save(callback))();
     },
-    clear() {
+    async clear() {
       delete req.session.alertMessage;
       delete req.session.alertType;
     },

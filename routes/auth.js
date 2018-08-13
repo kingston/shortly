@@ -100,8 +100,8 @@ router.get('/login', (req, res, next) => {
 
 /* POST logout page */
 
-router.post('/logout', (req, res, next) => {
-  authSession.logout(req);
+router.post('/logout', async (req, res, next) => {
+  await authSession.logout(req);
   res.redirect('/auth/login');
 });
 
@@ -117,7 +117,7 @@ router.post('/login', authLimiter, async (req, res, next) => {
     const rawSettings = await Setting.findAll({ attributes: ['key', 'value'] });
     const settings = new Map(rawSettings.map(i => [i.key, i.value]));
     if (await checkLogin(req, settings)) {
-      authSession.login(req);
+      await authSession.login(req);
       res.redirect('/urls');
     } else {
       renderLogin(res, 'Your username or password was incorrect.');
