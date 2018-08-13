@@ -40,6 +40,7 @@ router.get('/urls', async (req, res, next) => {
       alertType,
       alertMessage,
       csrfToken,
+      title: 'Shortly URLs',
     });
   } catch (err) {
     logger.error('Unable to list URLs', err);
